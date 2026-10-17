@@ -6,6 +6,7 @@ A self-hosted grade calculator for German schools. Track your grades across seme
 
 - 📚 Manage multiple school years and subjects
 - 📝 Track grades per semester with custom categories and weights
+- 🎓 Abirechner Sachsen (Oberstufe): Gesamtqualifikation bis 900 Punkte, Zielschnitt-Verteilung, Best-/Worst-Case
 - 📊 Grade statistics with bar charts and subject breakdown
 - 🌐 Offline support — works without internet, syncs automatically when back online
 - 🔒 User accounts with login, registration, and admin panel

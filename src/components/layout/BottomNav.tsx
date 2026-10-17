@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, usePathname } from 'next/navigation'
-import { BookOpen, BookOpenCheck, Award, Settings, BarChart2 } from 'lucide-react'
+import { BookOpen, BookOpenCheck, Award, Settings, BarChart2, GraduationCap } from 'lucide-react'
 import { useApp } from '@/components/AppProvider'
 
 const navItems = [
@@ -9,6 +9,7 @@ const navItems = [
   { label: '2. HJ',        path: '/half/2',  icon: BookOpenCheck },
   { label: 'Endnote',      path: '/final',   icon: Award },
   { label: 'Statistik',    path: '/stats',   icon: BarChart2 },
+  { label: 'Abi',          path: '/abi',     icon: GraduationCap },
   { label: 'Einstellungen',path: '/settings',icon: Settings },
 ]
 
@@ -23,7 +24,7 @@ export default function BottomNav() {
     ? navItems
         .filter(i => i.path !== '/half/2' && i.path !== '/final')
         .map(i => (i.path === '/half/1' ? { ...i, label: 'Halbjahr' } : i))
-    : navItems
+    : navItems.filter(i => i.path !== '/abi')
 
   return (
     <nav className="bottom-nav">
