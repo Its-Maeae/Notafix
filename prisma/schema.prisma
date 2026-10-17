@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String   @id @default(cuid())
+  email              String   @unique
+  password           String
+  isAdmin            Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  passwordResetToken String?
+  passwordResetAt    DateTime?
+
+  settings      UserSettings?
+  years         SchoolYear[]
+  tokens        AuthToken[]
+  loginAttempts LoginAttempt[]
+}
+
+model UserSettings {
+  id       String  @id @default(cuid())
+  userId   String  @unique
+  darkMode Boolean @default(false)
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuthToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  userId    String?
+  email     String
+  ipAddress String
+  success   Boolean
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model BlockedIP {
+  id        String   @id @default(cuid())
+  ipAddress String   @unique
+  reason    String?
+  createdAt DateTime @default(now())
+}
+
+model SchoolYear {
+  id          String    @id @default(cuid())
+  name        String
+  userId      String
+  pointSystem Boolean   @default(false)
+  isOberstufe Boolean   @default(false)
+  semester    Int?      // Oberstufe: 1 = 11/1, 2 = 11/2, 3 = 12/1, 4 = 12/2
+  groupId     String?   // gleiche groupId = gehören zusammen (alle Halbjahre einer Oberstufe)
+  groupName   String?
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjects    Subject[]
+}
+
+model Subject {
+  id          String          @id @default(cuid())
+  name        String
+  customName  String?
+  yearId      String
+  examWeight  Float           @default(50)
+  otherWeight     Float           @default(50)
+  isLeistungskurs Boolean         @default(false)
+  year        SchoolYear      @relation(fields: [yearId], references: [id], onDelete: Cascade)
+  grades      Grade[]
+  categories  GradeCategory[]
+}
+
+model GradeCategory {
+  id        String  @id @default(cuid())
+  name      String
+  weight    Float   @default(50)
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  grades    Grade[]
+}
+
+model Grade {
+  id         String         @id @default(cuid())
+  value      Float
+  modifier   String?
+  type       String
+  subjectId  String
+  categoryId String?
+  half       Int
+  subject    Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  category   GradeCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt  DateTime       @default(now())
+}
