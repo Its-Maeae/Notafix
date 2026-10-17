@@ -89,13 +89,19 @@ export function AppProvider({ children, initialSettings }: { children: ReactNode
     })
   }
 
+  function selectYear(id: string) {
+    selectedYearIdRef.current = id
+    setSelectedYearId(id)
+  }
+
   // ── Averages ─────────────────────────────────────────────────────────────
   function subjectAvg(s: Subject, half: number | null) {
     return calculateSubjectAverage(s.grades, s.categories, half, s.examWeight, s.otherWeight)
   }
 
   function getHalfAverage(half: number): number | null {
-    const y = yearsRef.current.find(y => y.id === selectedYearIdRef.current) ?? null
+    // Immer aus dem aktuellen State lesen (nicht aus Refs, die erst nach dem Render aktualisiert werden)
+    const y = selectedYear
     if (!y) return null
     const avgs = y.subjects.map(s => subjectAvg(s, half)).filter((a): a is number => a !== null)
     if (!avgs.length) return null
@@ -103,7 +109,8 @@ export function AppProvider({ children, initialSettings }: { children: ReactNode
   }
 
   function getFinalAverage(): number | null {
-    const y = yearsRef.current.find(y => y.id === selectedYearIdRef.current) ?? null
+    // Immer aus dem aktuellen State lesen (nicht aus Refs, die erst nach dem Render aktualisiert werden)
+    const y = selectedYear
     if (!y) return null
     const avgs = y.subjects.map(s => subjectAvg(s, null)).filter((a): a is number => a !== null)
     if (!avgs.length) return null
@@ -658,7 +665,7 @@ export function AppProvider({ children, initialSettings }: { children: ReactNode
   return (
     <AppContext.Provider value={{
       years, selectedYearId, selectedYear, settings, loading, isOnline, pendingSync,
-      selectYear: setSelectedYearId,
+      selectYear,
       addYear, deleteYear, addSubject, deleteSubject,
       addGrade, deleteGrade, updateWeights, updateSettings,
       updateYearPointSystem, addCategory, updateCategory, deleteCategory,
